@@ -34,6 +34,7 @@ public class JobDomainConverter {
         jobPo.setGmtModified(jobPo.getGmtCreated());
         jobPo.setSubmitNodeGroup(job.getSubmitNodeGroup());
         jobPo.setTaskTrackerNodeGroup(job.getTaskTrackerNodeGroup());
+        jobPo.setTaskTrackerIdentity(job.getTaskTrackerIdentity());
 
         if (CollectionUtils.isNotEmpty(job.getExtParams())) {
             Set<String> removeKeySet = null;

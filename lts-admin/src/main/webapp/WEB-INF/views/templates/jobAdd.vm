@@ -121,6 +121,22 @@
                                 </select>
                             </div>
                         </div>
+
+                        #foreach($groupNodes in ${groupNodesMap.keySet()})
+                            <div class="form-group lts-real-job-group task-nodes $groupNodes" style="display: none;">
+                                <label class="col-sm-2 control-label">执行节点</label>
+
+                                <div class="col-sm-4">
+                                    <select name="taskTrackerNode-$groupNodes" class="form-control">
+                                        <option value="">-- 默认随机分配执行节点 --</option>
+                                        #foreach($node in ${groupNodesMap.get($groupNodes)})
+                                            <option value="$node.identity">$node.identity</option>
+                                        #end
+                                    </select>
+                                </div>
+                            </div>
+                        #end
+
                         <div class="form-group">
                             <label class="col-sm-2 control-label">用户参数</label>
 
@@ -159,19 +175,30 @@
                 $(".lts-cron-job-group").hide();
                 $(".lts-trigger-job-group").hide();
                 $(".lts-repeat-job-group").hide();
+                var taskTrackerNodeGroup = $("select[name='taskTrackerNodeGroup']").val();
+                $("."+taskTrackerNodeGroup).show();
             } else if (jobType == 'TRIGGER_TIME_JOB') {
+                $(".lts-real-job-group").hide();
                 $(".lts-cron-job-group").hide();
                 $(".lts-repeat-job-group").hide();
                 $(".lts-trigger-job-group").show();
             } else if (jobType == 'CRON_JOB') {
+                $(".lts-real-job-group").hide();
                 $(".lts-trigger-job-group").hide();
                 $(".lts-repeat-job-group").hide();
                 $(".lts-cron-job-group").show();
             } else if (jobType == 'REPEAT_JOB') {
+                $(".lts-real-job-group").hide();
                 $(".lts-cron-job-group").hide();
                 $(".lts-trigger-job-group").hide();
                 $(".lts-repeat-job-group").show();
             }
+        });
+
+        $(document).on("change", "select[name='taskTrackerNodeGroup']", function () {
+            var taskTrackerNodeGroup = $(this).val();
+            $(".task-nodes").hide();
+            $("."+taskTrackerNodeGroup).show();
         });
 
         $(document).on("click", "#addBtn", function () {
@@ -181,11 +208,11 @@
                 var value = $(this).val().trim();
                 params[name] = value;
             });
-
             var jobType = params['jobType'];
             if (jobType == 'REAL_TIME_JOB') {
                 params['cronExpression'] = '';
                 params['triggerTime'] = '';
+                params['taskTrackerIdentity'] = params['taskTrackerNode-'+params['taskTrackerNodeGroup']];
             } else if (jobType == 'TRIGGER_TIME_JOB') {
                 params['cronExpression'] = '';
                 var triggerTime = params['triggerTime'];
@@ -221,7 +248,6 @@
                 }
             }
 
-            debugger;
 
             // check form
             if (!params['taskId']) {
@@ -269,6 +295,7 @@
                     if (json && json.success) {
                         swal('添加成功');
                         $("#resetBtn").trigger("click");
+                        $(".lts-real-job-group").hide();
                         $(".lts-cron-job-group").hide();
                         $(".lts-trigger-job-group").hide();
                         $(".lts-repeat-job-group").hide();

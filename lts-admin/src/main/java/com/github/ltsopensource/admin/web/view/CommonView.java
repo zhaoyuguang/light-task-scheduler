@@ -1,7 +1,9 @@
 package com.github.ltsopensource.admin.web.view;
 
 import com.github.ltsopensource.admin.cluster.BackendAppContext;
+import com.github.ltsopensource.core.cluster.Node;
 import com.github.ltsopensource.core.cluster.NodeType;
+import com.github.ltsopensource.core.commons.utils.CollectionUtils;
 import com.github.ltsopensource.core.commons.utils.DateUtils;
 import com.github.ltsopensource.queue.domain.NodeGroupPo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Robert HG (254963746@qq.com) on 6/6/15.
@@ -52,6 +53,20 @@ public class CommonView {
     @RequestMapping("job-add")
     public String addJobUI(Model model) {
         setAttr(model);
+        List<Node> taskTrackerNodeList = appContext.getNodeMemCacheAccess().getNodeByNodeType(NodeType.TASK_TRACKER);
+        Map<String, List<Node>> groupNodesMap = new HashMap<String, List<Node>>();
+        if(CollectionUtils.isNotEmpty(taskTrackerNodeList)){
+            for(final Node node : taskTrackerNodeList){
+                String group = node.getGroup();
+                List<Node> groupNodes = groupNodesMap.get(group);
+                if(CollectionUtils.isNotEmpty(groupNodes)){
+                    groupNodes.add(node);
+                }else{
+                    groupNodesMap.put(group, new ArrayList<Node>(){{add(node);}});
+                }
+            }
+        }
+        model.addAttribute("groupNodesMap", groupNodesMap);
         return "jobAdd";
     }
 

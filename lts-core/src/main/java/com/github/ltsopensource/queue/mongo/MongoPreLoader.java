@@ -50,6 +50,10 @@ public class MongoPreLoader extends AbstractPreLoader {
                 .field("isRunning").equal(false)
                 .field("triggerTime").equal(triggerTime)
                 .field("gmtModified").equal(gmtModified);
+        updateQuery.or(
+                updateQuery.criteria("taskTrackerIdentity").doesNotExist(),
+                updateQuery.criteria("taskTrackerIdentity").equal(taskTrackerIdentity)
+        );
         UpdateResults updateResult = template.update(updateQuery, operations);
         return updateResult.getUpdatedCount() == 1;
     }

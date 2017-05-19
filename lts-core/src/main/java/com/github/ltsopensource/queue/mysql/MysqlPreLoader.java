@@ -57,6 +57,7 @@ public class MysqlPreLoader extends AbstractPreLoader {
                     .and("is_running = ?", false)
                     .and("trigger_time = ?", triggerTime)
                     .and("gmt_modified = ?", gmtModified)
+                    .andOnNotEmpty("(task_tracker_identity = ? or task_tracker_identity is null)", taskTrackerIdentity)
                     .doUpdate() == 1;
         } catch (Exception e) {
             LOGGER.error("Error when lock job:" + e.getMessage(), e);

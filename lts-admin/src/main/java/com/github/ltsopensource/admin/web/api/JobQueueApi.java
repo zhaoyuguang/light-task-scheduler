@@ -298,6 +298,7 @@ public class JobQueueApi extends AbstractMVC {
             job.setRepeatInterval(null);
             job.setRepeatCount(0);
             job.setRelyOnPrevCycle(true);
+            job.setTaskTrackerIdentity(request.getTaskTrackerIdentity());
         } else if ("TRIGGER_TIME_JOB".equals(jobType)) {
             job.setCronExpression(null);
             job.setRepeatInterval(null);

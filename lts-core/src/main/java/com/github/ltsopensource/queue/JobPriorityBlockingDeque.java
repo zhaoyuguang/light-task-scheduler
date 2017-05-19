@@ -1,5 +1,6 @@
 package com.github.ltsopensource.queue;
 
+import com.github.ltsopensource.core.commons.utils.StringUtils;
 import com.github.ltsopensource.queue.domain.JobPo;
 
 import java.util.*;
@@ -52,9 +53,26 @@ public class JobPriorityBlockingDeque {
     public JobPo pollFirst() {
         lock.lock();
         try {
-            JobPo f = list.pollFirst();
+            JobPo f = list.removeFirst();
             if (f == null)
                 return null;
+            jobs.remove(f.getJobId());
+            return f;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public JobPo pollFirst(String taskTrackerIdentity) {
+        lock.lock();
+        try {
+            JobPo f = list.removeFirst();
+            if (f == null){
+                return null;
+            }
+            if(StringUtils.isNotEmpty(f.getTaskTrackerIdentity())){
+
+            }
             jobs.remove(f.getJobId());
             return f;
         } finally {
@@ -121,6 +139,10 @@ public class JobPriorityBlockingDeque {
 
     public JobPo poll() {
         return pollFirst();
+    }
+
+    public JobPo poll(String taskTrackerIdentity) {
+        return pollFirst(taskTrackerIdentity);
     }
 
     public int size() {

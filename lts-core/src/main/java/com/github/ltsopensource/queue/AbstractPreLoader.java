@@ -139,7 +139,7 @@ public abstract class AbstractPreLoader implements PreLoader {
 
     public JobPo take(String taskTrackerNodeGroup, String taskTrackerIdentity) {
         while (true) {
-            JobPo jobPo = get(taskTrackerNodeGroup);
+            JobPo jobPo = get(taskTrackerNodeGroup, taskTrackerIdentity);
             if (jobPo == null) {
                 DotLogUtils.dot("Empty JobQueue, taskTrackerNodeGroup:{}, taskTrackerIdentity:{}", taskTrackerNodeGroup, taskTrackerIdentity);
                 return null;
@@ -205,7 +205,7 @@ public abstract class AbstractPreLoader implements PreLoader {
      */
     protected abstract List<JobPo> load(String loadTaskTrackerNodeGroup, int loadSize);
 
-    private JobPo get(String taskTrackerNodeGroup) {
+    private JobPo get(String taskTrackerNodeGroup, String taskTrackerIdentity) {
 
         JobPriorityBlockingDeque queue = getQueue(taskTrackerNodeGroup);
 
@@ -218,7 +218,8 @@ public abstract class AbstractPreLoader implements PreLoader {
                 doLoad();
             }
         }
-        JobPo jobPo = queue.poll();
+        JobPo jobPo = queue.poll(taskTrackerIdentity);
+
         if (jobPo != null && jobPo.getPriority() == Integer.MIN_VALUE) {
             if (CollectionUtils.isNotEmpty(jobPo.getInternalExtParams())) {
                 if (jobPo.getInternalExtParams().containsKey(Constants.OLD_PRIORITY)) {

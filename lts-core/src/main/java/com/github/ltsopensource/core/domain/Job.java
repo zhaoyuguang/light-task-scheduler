@@ -27,9 +27,11 @@ public class Job implements Serializable {
     private Integer priority = 100;
     // 提交的节点 （可以手动指定）
     private String submitNodeGroup;
-    // 执行的节点
+    // 执行的节点组
     @NotNull
     private String taskTrackerNodeGroup;
+    //执行的节点
+    private String taskTrackerIdentity;
 
     private Map<String, String> extParams;
     // 是否要反馈给客户端
@@ -94,6 +96,14 @@ public class Job implements Serializable {
 
     public void setTaskTrackerNodeGroup(String taskTrackerNodeGroup) {
         this.taskTrackerNodeGroup = taskTrackerNodeGroup;
+    }
+
+    public String getTaskTrackerIdentity() {
+        return taskTrackerIdentity;
+    }
+
+    public void setTaskTrackerIdentity(String taskTrackerIdentity) {
+        this.taskTrackerIdentity = taskTrackerIdentity;
     }
 
     public boolean isNeedFeedback() {
@@ -213,6 +223,9 @@ public class Job implements Serializable {
         }
         if (taskTrackerNodeGroup.length() > 64) {
             throw new JobSubmitException("taskTrackerNodeGroup length should not great than 64! job is " + toString());
+        }
+        if (taskTrackerIdentity!=null && taskTrackerIdentity.length() > 64) {
+            throw new JobSubmitException("taskTrackerNode length should not great than 64! job is " + toString());
         }
         if (StringUtils.isNotEmpty(cronExpression)) {
             if (!CronExpression.isValidExpression(cronExpression)) {
